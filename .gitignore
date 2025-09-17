@@ -1,0 +1,23 @@
+# Xcode
+*.xcworkspace
+!/*.xcodeproj/project.pbxproj
+*.xcuserstate
+DerivedData/
+
+# User data
+*.xcuserdatad
+
+# Swift Package Manager
+/.build
+/.swiftpm
+
+# macOS
+.DS_Store
+
+# Realm
+*.realm
+*.realm.lock
+*.realm.management
+
+# Build
+build/

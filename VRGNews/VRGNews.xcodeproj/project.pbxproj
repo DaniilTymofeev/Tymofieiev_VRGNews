@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2E1FB0E12E7B4E2400EECA3E /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2E1FB0E02E7B4E2400EECA3E /* RealmSwift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		2E1FB0C32E7B40FB00EECA3E /* VRGNews.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VRGNews.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E1FB0E12E7B4E2400EECA3E /* RealmSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -64,8 +69,6 @@
 				2E1FB0C52E7B40FB00EECA3E /* VRGNews */,
 			);
 			name = VRGNews;
-			packageProductDependencies = (
-			);
 			productName = VRGNews;
 			productReference = 2E1FB0C32E7B40FB00EECA3E /* VRGNews.app */;
 			productType = "com.apple.product-type.application";
@@ -94,6 +97,9 @@
 			);
 			mainGroup = 2E1FB0BA2E7B40FB00EECA3E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				2E1FB0DD2E7B4E2300EECA3E /* XCRemoteSwiftPackageReference "realm-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2E1FB0C42E7B40FB00EECA3E /* Products */;
 			projectDirPath = "";
@@ -332,6 +338,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2E1FB0DD2E7B4E2300EECA3E /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2E1FB0E02E7B4E2400EECA3E /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2E1FB0DD2E7B4E2300EECA3E /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2E1FB0BB2E7B40FB00EECA3E /* Project object */;
 }
