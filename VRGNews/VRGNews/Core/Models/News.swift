@@ -5,6 +5,7 @@
 //  Created by Danil Tymofeev on 18.09.2025.
 //
 
+import Realm
 import RealmSwift
 import SwiftUI
 

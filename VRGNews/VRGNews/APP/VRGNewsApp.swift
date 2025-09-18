@@ -11,7 +11,23 @@ import SwiftUI
 struct VRGNewsApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
+        }
+    }
+}
+
+struct MainTabView: View {
+    var body: some View {
+        TabView {
+            NewsSearchView()
+                .tabItem {
+                    Label("Search", systemImage: "magnifyingglass")
+                }
+            
+            CategoriesView()
+                .tabItem {
+                    Label("Categories", systemImage: "square.grid.2x2")
+                }
         }
     }
 }
