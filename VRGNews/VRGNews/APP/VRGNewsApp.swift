@@ -20,7 +20,7 @@ struct VRGNewsApp: App {
 struct MainTabView: View {
     var body: some View {
         TabView {
-            NewsSearchView()
+            SearchNewsView()
                 .tabItem {
                     Label("Search", systemImage: "magnifyingglass")
                 }
