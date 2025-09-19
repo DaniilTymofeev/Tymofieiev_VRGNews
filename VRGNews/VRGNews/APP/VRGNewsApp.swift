@@ -12,6 +12,7 @@ struct VRGNewsApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
+                .preferredColorScheme(.light) // Force light mode
         }
     }
 }
@@ -28,6 +29,14 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Categories", systemImage: "square.grid.2x2")
                 }
+        }
+        .background(Color.white)
+        .preferredColorScheme(.light)
+        .onAppear {
+            // Additional iOS-specific settings to force light mode
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                windowScene.windows.first?.overrideUserInterfaceStyle = .light
+            }
         }
     }
 }

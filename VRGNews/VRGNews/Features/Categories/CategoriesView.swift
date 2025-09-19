@@ -12,6 +12,9 @@ struct CategoriesView: View {
         NavigationView {
             Text("Categories")
                 .navigationTitle("Categories")
+                .background(Color.white)
         }
+        .background(Color.white)
+        .preferredColorScheme(.light)
     }
 }
