@@ -13,14 +13,27 @@ class SearchNewsRepository {
     private let networkManager = NetworkManager.shared
     
     // MARK: - Load News from API
-    func loadNews(keyword: String) async throws {
+    func loadNews(keyword: String, page: Int = 1, pageSize: Int = 20) async throws -> (news: [News], totalResults: Int) {
         do {
-            let result = try await networkManager.searchNews(query: keyword)
+            let result = try await networkManager.searchNews(query: keyword, page: page, pageSize: pageSize)
             save(result.news)
+            return (news: result.news, totalResults: result.totalResults)
         } catch {
             print("Error loading news: \(error)")
             throw error
         }
+    }
+    
+    // MARK: - First Load (Refresh)
+    func firstLoad(keyword: String) async throws -> (news: [News], totalResults: Int) {
+        // Clear all existing news before loading new ones
+        deleteAll()
+        return try await loadNews(keyword: keyword, page: 1, pageSize: 20)
+    }
+    
+    // MARK: - Load More (Pagination)
+    func loadMore(keyword: String, page: Int) async throws -> (news: [News], totalResults: Int) {
+        return try await loadNews(keyword: keyword, page: page, pageSize: 20)
     }
     
     // MARK: - Save Operations
@@ -34,9 +47,9 @@ class SearchNewsRepository {
     
     // MARK: - Fetch Operations
     func fetchAll() -> Results<News> {
-        // Fetch all news with category field as nil
+        // Fetch all news with category field as nil, ordered by insertion timestamp (chronological order of loading)
         let predicate = NSPredicate(format: "category == nil")
-        return realmManager.fetchFilteredAndSorted(News.self, predicate: predicate, by: "publishedAt", ascending: false)
+        return realmManager.fetchFilteredAndSorted(News.self, predicate: predicate, by: "insertionTimestamp", ascending: true)
     }
     
     // MARK: - Delete Operations

@@ -58,7 +58,10 @@ class NetworkManager {
             return (news: parsedNews, totalResults: newsResponse.totalResults)
             
         } catch {
-            print("Network request failed: \(error)")
+            // Don't log cancellation errors as they're expected
+            if (error as NSError).code != NSURLErrorCancelled {
+                print("Network request failed: \(error)")
+            }
             throw error
         }
     }
@@ -82,6 +85,9 @@ class NetworkManager {
                 let formatter = ISO8601DateFormatter()
                 news.publishedAt = formatter.date(from: publishedAtString)
             }
+            
+            // Set insertion timestamp to current time (this will be overridden if already exists)
+            news.insertionTimestamp = Date()
             
             return news
         }
