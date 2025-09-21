@@ -55,17 +55,30 @@ What can be improved: we could use more of API functionality like sorting, shoos
 
 ## 4. Screenshots & Demos
 
-📱 Main List Screen
-![News List](screenshots/news_list.png)
+📱 Search News 
+(pagination, pull to refresh, tap on news redirect)
 
-🔎 News Detail Screen
-![Detail Screen](screenshots/detail.gif)
+https://github.com/user-attachments/assets/ff78ba9f-e973-4903-ae6f-39b463ecbdeb
 
-↔️ Pagination in Action
-![Pagination](screenshots/pagination.gif)
+(search, pull to refresh, refresh default key 'ukraine')
 
-🔄 Pull-to-Refresh Animation
-![Refresh](screenshots/refresh.gif)
+https://github.com/user-attachments/assets/5428cd18-d837-40e7-9e36-8e3c01631152
+
+
+
+📱 Categories Screen
+(pagination, pull to refresh)
+
+https://github.com/user-attachments/assets/633c17c7-5b73-48f4-bdc2-68b9d7372501
+
+
+(change category)
+https://github.com/user-attachments/assets/02e844a5-f4b1-4a1d-8504-db8cfacf2bfc
+
+
+📱 Realm for both screens
+https://github.com/user-attachments/assets/1614a061-5848-4c56-b5a4-5318c615a403
+
 
 ---
 
