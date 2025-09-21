@@ -15,6 +15,18 @@ struct NewsCell: View {
         isAlternateColor ? .red : .blue
     }
     
+    // Format description text
+    private var formattedDescription: (text: String, hasMore: Bool) {
+        let result = NewsTextFormatter.formatDescription(news.descriptionText, maxLength: 100)
+        return (text: result.text, hasMore: result.hasMore)
+    }
+    
+    // Format content text
+    private var formattedContent: (text: String, hasMore: Bool) {
+        let result = NewsTextFormatter.formatContent(news.content, maxLength: 150)
+        return (text: result.text, hasMore: result.hasMore)
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             Rectangle()
@@ -50,18 +62,18 @@ struct NewsCell: View {
                     AsyncImage(url: URL(string: news.urlToImage ?? "")) { image in
                         image
                             .resizable()
-                            .aspectRatio(contentMode: .fill)
+                            .aspectRatio(contentMode: .fill) // Try .fit for different behavior
                     } placeholder: {
                         Image("VRGNews_logo")
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                     }
-                    .frame(width: 100, height: 100)
+                    .frame(width: 140, height: 100) // Wider but same height
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     
                     VStack(alignment: .leading, spacing: 0) {
-                        if let description = news.descriptionText {
-                            Text(description)
+                        if !formattedDescription.text.isEmpty {
+                            Text(formattedDescription.text)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.leading)
@@ -77,14 +89,24 @@ struct NewsCell: View {
                 }
                 .padding(.bottom, 8)
                 
-                if let content = news.content {
-                    Text(content)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .lineLimit(4)
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.bottom, news.author != nil ? 4 : 0)
+                if !formattedContent.text.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(formattedContent.text)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(4)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.bottom, news.author != nil ? 4 : 0)
+                        
+                        if formattedContent.hasMore {
+                            Text("more")
+                                .font(.caption2)
+                                .foregroundColor(.blue)
+                                .underline()
+                                .padding(.bottom, news.author != nil ? 4 : 0)
+                        }
+                    }
                 }
                 
                 if let author = news.author {

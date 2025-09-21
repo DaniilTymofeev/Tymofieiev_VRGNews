@@ -65,26 +65,25 @@ struct CategoryPickerView: View {
             
             Divider()
             
-            // Categories grid
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 12) {
-                    ForEach(Category.allCases, id: \.self) { category in
-                        CategoryButton(
-                            category: category,
-                            isSelected: category == selectedCategory,
-                            onTap: {
-                                onCategorySelected(category)
-                            }
-                        )
-                    }
+            // Categories grid - Fixed height based on content
+            LazyVGrid(columns: columns, spacing: 12) {
+                ForEach(Category.allCases, id: \.self) { category in
+                    CategoryButton(
+                        category: category,
+                        isSelected: category == selectedCategory,
+                        onTap: {
+                            onCategorySelected(category)
+                        }
+                    )
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 16)
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 16)
         }
         .background(Color(.systemBackground))
-        .cornerRadius(16, corners: [.topLeft, .topRight])
+        .cornerRadius(16) // Rounded on all corners
         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: -5)
+        .frame(maxHeight: 400) // Limit maximum height
     }
 }
 

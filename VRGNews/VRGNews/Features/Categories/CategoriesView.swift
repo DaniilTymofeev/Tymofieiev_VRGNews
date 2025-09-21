@@ -141,8 +141,10 @@ struct CategoriesView: View {
                             viewModel.showingCategoryPicker = false
                         }
                     
-                    VStack {
+                    VStack(spacing: 0) {
+                        // Position the picker right beneath the category header
                         Spacer()
+                            .frame(height: 120) // Adjust this value to position right below header
                         
                         CategoryPickerView(
                             selectedCategory: viewModel.selectedCategory,
@@ -153,7 +155,10 @@ struct CategoriesView: View {
                                 viewModel.showingCategoryPicker = false
                             }
                         )
+                        .padding(.horizontal, 16) // Add horizontal padding
                         .transition(.move(edge: .bottom))
+                        
+                        Spacer()
                     }
                 }
             }
