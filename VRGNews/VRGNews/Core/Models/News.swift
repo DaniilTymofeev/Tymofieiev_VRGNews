@@ -20,6 +20,7 @@ class News: Object, Codable, Identifiable {
     @Persisted var publishedAt: Date?
     @Persisted var content: String?
     @Persisted var category: String? // nil for global search, "sports", "business", etc for categories
+    @Persisted var searchKeyword: String? // nil for categories, search keyword for SearchNews
     @Persisted var insertionTimestamp: Date = Date() // Track when item was added to Realm
     
     enum CodingKeys: String, CodingKey {

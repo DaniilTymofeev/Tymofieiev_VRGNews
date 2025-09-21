@@ -16,7 +16,7 @@ class SearchNewsRepository {
     func loadNews(keyword: String, page: Int = 1, pageSize: Int = 20) async throws -> (news: [News], totalResults: Int) {
         do {
             let result = try await networkManager.searchNews(query: keyword, page: page, pageSize: pageSize)
-            save(result.news)
+            save(result.news, searchKeyword: keyword)
             return (news: result.news, totalResults: result.totalResults)
         } catch {
             print("Error loading news: \(error)")
@@ -37,10 +37,11 @@ class SearchNewsRepository {
     }
     
     // MARK: - Save Operations
-    func save(_ newsArray: [News]) {
-        // Set category to nil for all news items
+    func save(_ newsArray: [News], searchKeyword: String) {
+        // Set category to nil and searchKeyword for all news items
         for news in newsArray {
             news.category = nil
+            news.searchKeyword = searchKeyword
         }
         realmManager.saveArray(newsArray)
     }
@@ -50,6 +51,21 @@ class SearchNewsRepository {
         // Fetch all news with category field as nil, ordered by insertion timestamp (chronological order of loading)
         let predicate = NSPredicate(format: "category == nil")
         return realmManager.fetchFilteredAndSorted(News.self, predicate: predicate, by: "insertionTimestamp", ascending: true)
+    }
+    
+    // MARK: - Last Search Keyword
+    func getLastSearchKeyword() -> String? {
+        // Find the most recent news item with a searchKeyword
+        let predicate = NSPredicate(format: "searchKeyword != nil")
+        let results = realmManager.fetchFilteredAndSorted(News.self, predicate: predicate, by: "insertionTimestamp", ascending: false)
+        
+        if let lastNews = results.first {
+            print("🔍 Found last search keyword in Realm: '\(lastNews.searchKeyword ?? "nil")'")
+            return lastNews.searchKeyword
+        }
+        
+        print("🔍 No previous search keyword found in Realm")
+        return nil
     }
     
     // MARK: - Delete Operations

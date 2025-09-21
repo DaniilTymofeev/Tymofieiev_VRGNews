@@ -19,8 +19,13 @@ struct SearchNewsView: View {
                 
                 VStack(spacing: 0) {
                     if viewModel.isLoading {
-                        ProgressView("Loading news...")
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        VStack {
+                            VRGNewsLoadingView()
+                            Text("Loading news...")
+                                .foregroundColor(.secondary)
+                                .padding(.top, 8)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else if let errorMessage = viewModel.errorMessage {
                         VStack {
                             Image(systemName: "exclamationmark.triangle")
@@ -101,10 +106,10 @@ struct SearchNewsView: View {
                         if viewModel.isLoadingMore {
                             HStack {
                                 Spacer()
-                                ProgressView("Loading more...")
-                                    .padding()
+                                VRGNewsLoadingView()
                                 Spacer()
                             }
+                            .padding()
                         }
                     }
                 }
@@ -149,6 +154,18 @@ struct SearchBar: View {
                         }
                     }
                 }
+            
+            // Clear button - only show when there's text
+            if !text.isEmpty {
+                Button(action: {
+                    text = ""
+                    searchTask?.cancel() // Cancel any pending search
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.gray)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)

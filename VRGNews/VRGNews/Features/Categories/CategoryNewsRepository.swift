@@ -38,9 +38,10 @@ class CategoryNewsRepository {
     
     // MARK: - Save Operations
     func save(_ newsArray: [News], category: Category) {
-        // Set category for all news items
+        // Set category for all news items and clear searchKeyword
         for news in newsArray {
             news.category = category.rawValue
+            news.searchKeyword = nil // Categories don't have search keywords
         }
         realmManager.saveArray(newsArray)
     }
@@ -50,6 +51,23 @@ class CategoryNewsRepository {
         // Fetch all news for specific category, ordered by insertion timestamp
         let predicate = NSPredicate(format: "category == %@", category.rawValue)
         return realmManager.fetchFilteredAndSorted(News.self, predicate: predicate, by: "insertionTimestamp", ascending: true)
+    }
+    
+    // MARK: - Last Selected Category
+    func getLastSelectedCategory() -> Category? {
+        // Find the most recent news item with a category (not nil)
+        let predicate = NSPredicate(format: "category != nil")
+        let results = realmManager.fetchFilteredAndSorted(News.self, predicate: predicate, by: "insertionTimestamp", ascending: false)
+        
+        if let lastNews = results.first, let categoryString = lastNews.category {
+            if let category = Category(rawValue: categoryString) {
+                print("🔍 Found last selected category in Realm: '\(category.displayName)'")
+                return category
+            }
+        }
+        
+        print("🔍 No previous category found in Realm")
+        return nil
     }
     
     // MARK: - Delete Operations

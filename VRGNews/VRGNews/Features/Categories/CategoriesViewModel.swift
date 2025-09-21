@@ -26,6 +26,14 @@ class CategoriesViewModel: ObservableObject {
     private var refreshTask: Task<Void, Never>?
     
     init() {
+        // Try to find the last selected category from Realm
+        if let lastCategory = categoryNewsRepository.getLastSelectedCategory() {
+            selectedCategory = lastCategory
+            print("🔍 Found last selected category in Realm: '\(lastCategory.displayName)'")
+        } else {
+            selectedCategory = .general // Default value
+            print("🔍 No previous category found, using default: 'general'")
+        }
         loadInitialDataIfNeeded()
     }
     

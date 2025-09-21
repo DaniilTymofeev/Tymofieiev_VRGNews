@@ -22,9 +22,11 @@ struct CategoriesView: View {
                         // Initial loading state
                         VStack {
                             Spacer()
-                            ProgressView("Loading \(viewModel.selectedCategory.displayName) news...")
+                            VRGNewsLoadingView()
+                            Text("Loading \(viewModel.selectedCategory.displayName) news...")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
+                                .padding(.top, 8)
                             Spacer()
                         }
                     } else if let errorMessage = viewModel.errorMessage {
@@ -123,10 +125,10 @@ struct CategoriesView: View {
                         if viewModel.isLoadingMore {
                             HStack {
                                 Spacer()
-                                ProgressView("Loading more...")
-                                    .padding()
+                                VRGNewsLoadingView()
                                 Spacer()
                             }
+                            .padding()
                         }
                     }
                 }

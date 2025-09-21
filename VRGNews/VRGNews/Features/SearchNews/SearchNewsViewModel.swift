@@ -188,11 +188,20 @@ class SearchNewsViewModel: ObservableObject {
     }
     
     private func loadInitialDataIfNeeded() {
+        // Try to find the last search keyword from Realm
+        if let lastSearchKeyword = searchNewsRepository.getLastSearchKeyword() {
+            searchText = lastSearchKeyword
+            print("🔍 Found last search keyword in Realm: '\(lastSearchKeyword)'")
+        } else {
+            searchText = "ukraine" // Default value
+            print("🔍 No previous search found, using default: 'ukraine'")
+        }
+        
         refreshNewsList()
         if newsResults?.isEmpty ?? true {
             print("🚀 First time loading - fetching from API...")
             Task {
-                await firstLoad(keyword: "ukraine")
+                await firstLoad(keyword: searchText)
             }
         } else {
             let count = newsResults?.count ?? 0
