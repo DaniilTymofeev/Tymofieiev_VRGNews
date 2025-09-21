@@ -8,7 +8,6 @@
 import Foundation
 import RealmSwift
 
-// MARK: - Generic Realm Manager
 class RealmManager {
     static let shared = RealmManager()
     
@@ -54,11 +53,6 @@ class RealmManager {
         }
     }
     
-    func deleteById<T: Object>(_ type: T.Type, id: Any) {
-        guard let object = realm.object(ofType: type, forPrimaryKey: id) else { return }
-        delete(object)
-    }
-    
     func deleteAll<T: Object>(_ type: T.Type) {
         do {
             try realm.write {
@@ -74,41 +68,11 @@ class RealmManager {
         return realm.objects(type)
     }
     
-    func fetchById<T: Object>(_ type: T.Type, id: Any) -> T? {
-        return realm.object(ofType: type, forPrimaryKey: id)
-    }
-    
     func fetchFiltered<T: Object>(_ type: T.Type, predicate: NSPredicate) -> Results<T> {
         return realm.objects(type).filter(predicate)
     }
     
-    func fetchSorted<T: Object>(_ type: T.Type, by keyPath: String, ascending: Bool = true) -> Results<T> {
-        return realm.objects(type).sorted(byKeyPath: keyPath, ascending: ascending)
-    }
-    
     func fetchFilteredAndSorted<T: Object>(_ type: T.Type, predicate: NSPredicate, by keyPath: String, ascending: Bool = true) -> Results<T> {
         return realm.objects(type).filter(predicate).sorted(byKeyPath: keyPath, ascending: ascending)
-    }
-    
-    // MARK: - Generic Count Operations
-    func getCount<T: Object>(_ type: T.Type) -> Int {
-        return realm.objects(type).count
-    }
-    
-    func getFilteredCount<T: Object>(_ type: T.Type, predicate: NSPredicate) -> Int {
-        return realm.objects(type).filter(predicate).count
-    }
-    
-    // MARK: - Generic Update Operations
-    func update<T: Object>(_ type: T.Type, id: Any, updateBlock: @escaping (T) -> Void) {
-        guard let object = realm.object(ofType: type, forPrimaryKey: id) else { return }
-        
-        do {
-            try realm.write {
-                updateBlock(object)
-            }
-        } catch {
-            print("Error updating \(T.self): \(error)")
-        }
     }
 }

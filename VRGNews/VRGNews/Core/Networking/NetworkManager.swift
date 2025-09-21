@@ -57,7 +57,6 @@ class NetworkManager {
             return (news: parsedNews, totalResults: newsResponse.totalResults)
             
         } catch {
-            // Don't log cancellation errors as they're expected
             if (error as NSError).code != NSURLErrorCancelled {
                 print("Network request failed: \(error)")
             }
@@ -79,52 +78,15 @@ class NetworkManager {
             news.urlToImage = article.urlToImage
             news.content = article.content
             
-            // Parse published date
             if let publishedAtString = article.publishedAt {
                 let formatter = ISO8601DateFormatter()
                 news.publishedAt = formatter.date(from: publishedAtString)
             }
-            
-            // Set insertion timestamp to current time (this will be overridden if already exists)
             news.insertionTimestamp = Date()
             
             return news
         }
     }
-    
-//    private func saveNewsToRealm(_ articles: [NewsArticle]) async {
-//        let realm = try! Realm()
-//        
-//        try! realm.write {
-//            for article in articles {
-//                let news = News()
-//                news.id = article.url // Use URL as unique identifier
-//                news.source = Source()
-//                news.source?.id = article.source.id
-//                news.source?.name = article.source.name
-//                news.author = article.author
-//                news.title = article.title
-//                news.descriptionText = article.description
-//                news.url = article.url
-//                news.urlToImage = article.urlToImage
-//                news.content = article.content
-//                
-//                // Parse published date
-//                if let publishedAtString = article.publishedAt {
-//                    let formatter = ISO8601DateFormatter()
-//                    news.publishedAt = formatter.date(from: publishedAtString)
-//                }
-//                
-//                // Check if news already exists
-//                if realm.object(ofType: News.self, forPrimaryKey: news.id) == nil {
-//                    realm.add(news)
-//                } else {
-//                    // Update existing news
-//                    realm.add(news, update: .modified)
-//                }
-//            }
-//        }
-//    }
 }
 
 // MARK: - Network Error
@@ -147,4 +109,3 @@ enum NetworkError: Error, LocalizedError {
         }
     }
 }
-

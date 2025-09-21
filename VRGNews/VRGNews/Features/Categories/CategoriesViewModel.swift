@@ -231,13 +231,6 @@ class CategoriesViewModel: ObservableObject {
     }
     
     var hasMorePages: Bool {
-        // More conservative pagination logic to avoid rate limiting
-        // We have more pages if:
-        // 1. We have loaded at least one page (totalLoadedItems > 0)
-        // 2. We haven't loaded all available results yet
-        // 3. We haven't hit any API errors recently
-        // 4. We're not currently loading more
-        // 5. We haven't made too many requests (conservative limit)
         let hasReasonableLimit = currentPage < 10 // Don't go beyond 10 pages to avoid rate limits
         return totalLoadedItems > 0 && totalLoadedItems < totalAvailableResults && hasReasonableLimit && !isLoadingMore
     }

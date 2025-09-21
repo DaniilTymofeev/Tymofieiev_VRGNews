@@ -1,3 +1,10 @@
+//
+//  News.swift
+//  VRGNews
+//
+//  Created by Danil Tymofeev on 22.09.2025.
+//
+
 import SwiftUI
 
 struct VRGNewsLoadingView: View {
@@ -23,8 +30,4 @@ struct VRGNewsLoadingView: View {
                 }
         }
     }
-}
-
-#Preview {
-    VRGNewsLoadingView()
 }

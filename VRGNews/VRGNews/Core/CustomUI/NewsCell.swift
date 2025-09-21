@@ -15,13 +15,11 @@ struct NewsCell: View {
         isAlternateColor ? .red : .blue
     }
     
-    // Format description text
     private var formattedDescription: (text: String, hasMore: Bool) {
         let result = NewsTextFormatter.formatDescription(news.descriptionText, maxLength: 100)
         return (text: result.text, hasMore: result.hasMore)
     }
     
-    // Format content text
     private var formattedContent: (text: String, hasMore: Bool) {
         let result = NewsTextFormatter.formatContent(news.content, maxLength: 150)
         return (text: result.text, hasMore: result.hasMore)
@@ -62,13 +60,13 @@ struct NewsCell: View {
                     AsyncImage(url: URL(string: news.urlToImage ?? "")) { image in
                         image
                             .resizable()
-                            .aspectRatio(contentMode: .fill) // Try .fit for different behavior
+                            .aspectRatio(contentMode: .fill)
                     } placeholder: {
                         Image("VRGNews_logo")
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                     }
-                    .frame(width: 140, height: 100) // Wider but same height
+                    .frame(width: 140, height: 100)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     
                     VStack(alignment: .leading, spacing: 0) {
@@ -136,22 +134,3 @@ struct NewsCell: View {
         return formatter.localizedString(for: date, relativeTo: Date())
     }
 }
-
-//#Preview {
-//    let mockNews = News()
-//    mockNews.source = Source()
-//    mockNews.source?.name = "BBC News"
-//    mockNews.author = "Jude Sheerin"
-//    mockNews.title = "Zelensky and allies head to White House for Ukraine talks"
-//    mockNews.descriptionText = "European leaders will join Zelensky as he attends a crunch meeting with Trump on the Russia-Ukraine war."
-//    mockNews.url = "https://www.bbc.com/news/articles/cm21j1ve817o"
-//    mockNews.urlToImage = "https://ichef.bbci.co.uk/news/1024/branded_news/6ed8/live/f6c6ada0-7bb8-11f0-a34f-318be3fb0481.jpg"
-//    mockNews.publishedAt = Date()
-//    mockNews.content = "US President Donald Trump will host Volodymyr Zelensky on Monday for their first meeting..."
-//
-//    return VStack {
-//        NewsCell(news: mockNews, isAlternateColor: false)
-//        NewsCell(news: mockNews, isAlternateColor: true)
-//    }
-//    .padding()
-//}
