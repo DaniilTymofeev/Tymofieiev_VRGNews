@@ -13,77 +13,109 @@ struct SearchNewsView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                SearchBar(text: $viewModel.searchText, onSearch: viewModel.performSearch)
+            ZStack {
+                Color.white
+                    .ignoresSafeArea()
                 
-                if viewModel.isLoading {
-                    ProgressView("Loading news...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let errorMessage = viewModel.errorMessage {
-                    VStack {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.largeTitle)
-                            .foregroundColor(.red)
-                        Text(errorMessage)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                        
-                        Button("Retry") {
-                            viewModel.retryLoading()
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if !viewModel.hasNews {
-                    VStack {
-                        Image(systemName: "newspaper")
-                            .font(.largeTitle)
-                            .foregroundColor(.gray)
-                        Text("No news found")
-                            .foregroundColor(.secondary)
-                            .font(.title2)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let results = viewModel.newsResults {
-                    List(Array(results.enumerated()), id: \.element.id) { index, news in
-                        NewsCell(news: news, isAlternateColor: index % 2 == 1)
-                            .listRowSeparator(.hidden)
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                            .onAppear {
-                                // Load more when approaching the end
-                                if viewModel.shouldLoadMore(for: index) {
-                                    Task {
-                                        await viewModel.loadMore(keyword: viewModel.searchText.isEmpty ? "ukraine" : viewModel.searchText)
-                                    }
-                                }
-                            }
-                    }
-                    .listStyle(PlainListStyle())
-                    .refreshable {
-                        await viewModel.refreshData()
-                    }
-                    
-                    // Loading more indicator at bottom
-                    if viewModel.isLoadingMore {
-                        HStack {
-                            Spacer()
-                            ProgressView("Loading more...")
+                VStack(spacing: 0) {
+                    if viewModel.isLoading {
+                        ProgressView("Loading news...")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else if let errorMessage = viewModel.errorMessage {
+                        VStack {
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.largeTitle)
+                                .foregroundColor(.red)
+                            Text(errorMessage)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
                                 .padding()
-                            Spacer()
+                            
+                            Button("Retry") {
+                                viewModel.retryLoading()
+                            }
+                            .buttonStyle(.bordered)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else if !viewModel.hasNews {
+                        // Empty state with search bar
+                        List {
+                            // Search Bar Section
+                            Section {
+                                SearchBar(text: $viewModel.searchText, onSearch: viewModel.performSearch)
+                                    .listRowSeparator(.hidden)
+                                    .listRowBackground(Color.clear)
+                                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                            }
+                            
+                            // Empty state message
+                            Section {
+                                VStack {
+                                    Image(systemName: "newspaper")
+                                        .font(.largeTitle)
+                                        .foregroundColor(.gray)
+                                    Text("No news found")
+                                        .foregroundColor(.secondary)
+                                        .font(.title2)
+                                }
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
+                                .listRowInsets(EdgeInsets(top: 50, leading: 16, bottom: 50, trailing: 16))
+                            }
+                        }
+                        .listStyle(PlainListStyle())
+                    } else if let results = viewModel.newsResults {
+                        // News list with search bar
+                        List {
+                            // Search Bar Section
+                            Section {
+                                SearchBar(text: $viewModel.searchText, onSearch: viewModel.performSearch)
+                                    .listRowSeparator(.hidden)
+                                    .listRowBackground(Color.clear)
+                                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                            }
+                            
+                            // News Items Section
+                            ForEach(Array(results.enumerated()), id: \.element.id) { index, news in
+                                NewsCell(news: news, isAlternateColor: index % 2 == 1)
+                                    .listRowSeparator(.hidden)
+                                    .listRowBackground(Color.clear)
+                                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                                    .onAppear {
+                                        // Load more when approaching the end
+                                        if viewModel.shouldLoadMore(for: index) {
+                                            Task {
+                                                await viewModel.loadMore(keyword: viewModel.searchText.isEmpty ? "ukraine" : viewModel.searchText)
+                                            }
+                                        }
+                                    }
+                            }
+                        }
+                        .listStyle(PlainListStyle())
+                        .refreshable {
+                            await viewModel.refreshData()
+                        }
+                        
+                        // Loading more indicator at bottom
+                        if viewModel.isLoadingMore {
+                            HStack {
+                                Spacer()
+                                ProgressView("Loading more...")
+                                    .padding()
+                                Spacer()
+                            }
                         }
                     }
                 }
             }
-            .background(Color.white)
             .navigationTitle("Search News")
+            .onDisappear {
+                viewModel.cleanup()
+            }
         }
         .background(Color.white)
         .preferredColorScheme(.light)
-        .onDisappear {
-            viewModel.cleanup()
-        }
     }
 }
 
@@ -122,6 +154,6 @@ struct SearchBar: View {
         .padding(.vertical, 8)
         .background(Color.gray.opacity(0.1))
         .cornerRadius(10)
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
     }
 }

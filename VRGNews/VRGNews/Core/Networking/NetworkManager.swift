@@ -23,9 +23,8 @@ class NetworkManager {
         return try await performRequest(urlString: urlString)
     }
     
-    // MARK: - Category News
     func fetchCategoryNews(category: Category, page: Int = 1, pageSize: Int = 20) async throws -> (news: [News], totalResults: Int) {
-        let urlString = "\(APIConstants.categoryNewsURL)\(category.rawValue)&page=\(page)&pageSize=\(pageSize)"
+        let urlString = "\(APIConstants.categoryNewsURL)\(category.rawValue)&language=en&page=\(page)&pageSize=\(pageSize)"
         
         return try await performRequest(urlString: urlString)
     }

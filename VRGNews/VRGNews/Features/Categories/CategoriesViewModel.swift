@@ -1,24 +1,24 @@
 //
-//  SearchNewsViewModel.swift
+//  CategoriesViewModel.swift
 //  VRGNews
 //
 //  Created by Danil Tymofeev on 18.09.2025.
 //
 
-import Foundation
-import RealmSwift
 import SwiftUI
 import Combine
+import RealmSwift
 
 @MainActor
-class SearchNewsViewModel: ObservableObject {
+class CategoriesViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var isLoadingMore = false
     @Published var errorMessage: String?
     @Published var newsResults: Results<News>?
-    @Published var searchText = ""
+    @Published var selectedCategory: Category = .general
+    @Published var showingCategoryPicker = false
     
-    private let searchNewsRepository = SearchNewsRepository()
+    private let categoryNewsRepository = CategoryNewsRepository()
     private var currentPage = 1
     private var totalLoadedItems = 0
     private var totalAvailableResults = 0
@@ -29,9 +29,21 @@ class SearchNewsViewModel: ObservableObject {
         loadInitialDataIfNeeded()
     }
     
-    // MARK: - First Load / Refresh
-    func firstLoad(keyword: String) async {
-        guard !keyword.isEmpty else { return }
+    // MARK: - Load Initial Data
+    func loadInitialDataIfNeeded() {
+        // Check if we already have data for the selected category
+        if !categoryNewsRepository.hasNewsForCategory(selectedCategory) {
+            Task {
+                await firstLoad(category: selectedCategory)
+            }
+        } else {
+            refreshNewsList()
+        }
+    }
+    
+    // MARK: - First Load (Refresh)
+    func firstLoad(category: Category) async {
+        print("🔄 Starting first load for category: \(category.rawValue)")
         
         isLoading = true
         errorMessage = nil
@@ -39,19 +51,19 @@ class SearchNewsViewModel: ObservableObject {
         totalLoadedItems = 0
         
         do {
-            let result = try await searchNewsRepository.firstLoad(keyword: keyword)
+            let result = try await categoryNewsRepository.firstLoad(category: category)
             refreshNewsList()
             totalLoadedItems = result.news.count
             totalAvailableResults = result.totalResults
-            print("🔄 First load: \(result.news.count) news items for keyword: '\(keyword)' (Total available: \(result.totalResults))")
+            
+            print("✅ First load successful: \(result.news.count) news items for category: '\(category.rawValue)' (Total available: \(result.totalResults))")
         } catch {
-            // Check if it's a cancellation error (common with pull-to-refresh)
+            // Check if it's a cancellation error
             if (error as NSError).code == NSURLErrorCancelled {
                 print("⚠️ Request was cancelled (likely interrupted pull-to-refresh)")
-                // Don't show error for cancelled requests
                 errorMessage = nil
             } else {
-                print("❌ Failed to first load news for keyword '\(keyword)': \(error.localizedDescription)")
+                print("❌ Failed to first load news for category '\(category.rawValue)': \(error.localizedDescription)")
                 errorMessage = "Failed to load news: \(error.localizedDescription)"
             }
         }
@@ -60,8 +72,8 @@ class SearchNewsViewModel: ObservableObject {
     }
     
     // MARK: - Load More (Pagination)
-    func loadMore(keyword: String) async {
-        guard !keyword.isEmpty, !isLoadingMore, hasMorePages else { return }
+    func loadMore(category: Category) async {
+        guard !isLoadingMore && hasMorePages else { return }
         
         isLoadingMore = true
         currentPage += 1
@@ -70,20 +82,20 @@ class SearchNewsViewModel: ObservableObject {
         try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second delay
         
         do {
-            let result = try await searchNewsRepository.loadMore(keyword: keyword, page: currentPage)
+            let result = try await categoryNewsRepository.loadMore(category: category, page: currentPage)
             refreshNewsList()
             totalLoadedItems += result.news.count
             totalAvailableResults = result.totalResults // Update total available
             
-            print("📄 Loaded page \(currentPage): \(result.news.count) additional news items for keyword: '\(keyword)' (Total available: \(result.totalResults))")
+            print("📄 Loaded page \(currentPage): \(result.news.count) additional news items for category: '\(category.rawValue)' (Total available: \(result.totalResults))")
             
             // If we got 0 items, we've reached the end of available content
             if result.news.count == 0 {
-                print("🏁 No more items available for keyword '\(keyword)' - stopping pagination")
+                print("🏁 No more items available for category '\(category.rawValue)' - stopping pagination")
                 currentPage -= 1 // Revert page increment since this page was empty
             }
         } catch {
-            print("❌ Failed to load more news for keyword '\(keyword)': \(error.localizedDescription)")
+            print("❌ Failed to load more news for category '\(category.rawValue)': \(error.localizedDescription)")
             
             // Check if it's a rate limiting error (426) or similar
             if let httpError = error as? NetworkError,
@@ -92,23 +104,25 @@ class SearchNewsViewModel: ObservableObject {
                 print("🚫 API error \(statusCode) - stopping pagination to avoid rate limiting")
                 currentPage -= 1 // Revert page increment
                 // Don't show error message for rate limiting, just stop loading more
+                errorMessage = nil
             } else {
-                // Don't show error for load more, just log it
+                errorMessage = "Failed to load more news: \(error.localizedDescription)"
             }
         }
         
         isLoadingMore = false
     }
     
-    // MARK: - Search (Alias for firstLoad)
-    func performSearch(keyword: String) async {
-        await firstLoad(keyword: keyword)
-    }
-    
-    // MARK: - Retry Loading
-    func retryLoading() {
+    // MARK: - Category Selection
+    func selectCategory(_ category: Category) {
+        guard category != selectedCategory else { return }
+        
+        selectedCategory = category
+        showingCategoryPicker = false
+        
+        // Load news for new category
         Task {
-            await firstLoad(keyword: "ukraine")
+            await firstLoad(category: category)
         }
     }
     
@@ -126,15 +140,15 @@ class SearchNewsViewModel: ObservableObject {
             guard !Task.isCancelled else { return }
             
             // Force refresh by clearing existing data first
-            await forceRefresh(keyword: searchText.isEmpty ? "ukraine" : searchText)
+            await forceRefresh(category: selectedCategory)
         }
         
         await refreshTask?.value
     }
     
     // MARK: - Force Refresh (non-cancellable)
-    private func forceRefresh(keyword: String) async {
-        print("🔄 Starting force refresh for keyword: '\(keyword)'")
+    private func forceRefresh(category: Category) async {
+        print("🔄 Starting force refresh for category: '\(category.rawValue)'")
         
         // Set loading state
         isLoading = true
@@ -146,13 +160,13 @@ class SearchNewsViewModel: ObservableObject {
         
         while retryCount < maxRetries {
             do {
-                let result = try await searchNewsRepository.firstLoad(keyword: keyword)
+                let result = try await categoryNewsRepository.firstLoad(category: category)
                 refreshNewsList()
                 totalLoadedItems = result.news.count
                 totalAvailableResults = result.totalResults
                 currentPage = 1
                 
-                print("✅ Force refresh successful: \(result.news.count) news items for keyword: '\(keyword)' (Total available: \(result.totalResults))")
+                print("✅ Force refresh successful: \(result.news.count) news items for category: '\(category.rawValue)' (Total available: \(result.totalResults))")
                 isLoading = false
                 return
                 
@@ -182,33 +196,26 @@ class SearchNewsViewModel: ObservableObject {
     func shouldLoadMore(for itemIndex: Int) -> Bool {
         guard let results = newsResults else { return false }
         let totalItems = results.count
-        let loadMoreThreshold = totalItems - 3 // Load more when 3 items before end
         
-        return itemIndex >= loadMoreThreshold && !isLoadingMore && hasMorePages
+        // Load more when we're 3 items from the end
+        return itemIndex >= totalItems - 3 && hasMorePages && !isLoadingMore
     }
     
-    private func loadInitialDataIfNeeded() {
-        refreshNewsList()
-        if newsResults?.isEmpty ?? true {
-            print("🚀 First time loading - fetching from API...")
-            Task {
-                await firstLoad(keyword: "ukraine")
-            }
-        } else {
-            let count = newsResults?.count ?? 0
-            totalLoadedItems = count
-            print("📱 Showing cached data from Realm (\(count) items)")
+    // MARK: - Refresh news list from Realm
+    func refreshNewsList() {
+        newsResults = categoryNewsRepository.fetchAllForCategory(selectedCategory)
+    }
+    
+    // MARK: - Retry loading
+    func retryLoading() {
+        Task {
+            await firstLoad(category: selectedCategory)
         }
-    }
-    
-    private func refreshNewsList() {
-        newsResults = searchNewsRepository.fetchAll()
     }
     
     // MARK: - Computed Properties
     var hasNews: Bool {
-        guard let results = newsResults else { return false }
-        return !results.isEmpty
+        return newsResults?.count ?? 0 > 0
     }
     
     var newsCount: Int {
