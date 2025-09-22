@@ -29,9 +29,9 @@ I approached the task with the following stack and decisions:
 * **My Vision**:
 I saw this APP as SwiftUI quick, sharp and minimalistic but with some UI/UX flavor with images, animation. For navigation I sticked with native TabBar because it meets all my expectatios of usability and ui look (also used navigation to web browser because we have links in those News responses). Realm is simple, familier and flexible for using only 1 model with little alterations to filter through saved objects and show on both screens. Paggination works on both screen, doing safe calculation when to load and when to stop.
 
-I implmeneted convinient file structure, added resources, formatters for strings, paginations for liast, timestamps to load from Realm properly.
+I implmeneted a convinient file structure, added resources, formatters for strings, paginations for lists, timestamps to load from Realm properly.
 
-SearchNews screen: we have initial load with 'ukraine' as search keyword; user can scroll with pagination, use pull-to-refresh with inputed keyword, search any string news; every successful search will clear all instances on News in Relam with searchedKeyword != nil and save new ones.
+SearchNews screen: we have initial load with 'ukraine' as search keyword; user can scroll with pagination, use pull-to-refresh with inputed keyword, search any string news; to go back to the top of th list just tap at the same tabbar item; every successful search will clear all instances on News in Relam with searchedKeyword != nil and save new ones.
 
 Categories screen: we can load only US related news by seected category; initial categotu is 'general'; basic loads and refresh are as on SearchNews screen;
 
