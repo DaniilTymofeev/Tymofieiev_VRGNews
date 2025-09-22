@@ -4,6 +4,8 @@
 *Test task for VRG Soft*
 
 ![UI](https://img.shields.io/badge/UI-SwiftUI-purple)
+![DB](https://img.shields.io/badge/DB-Realm-red)
+![ThirdParty](https://img.shields.io/badge/Libraries-SPM-green)
 
 ---
 
