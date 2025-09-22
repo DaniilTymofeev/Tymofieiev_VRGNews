@@ -73,11 +73,15 @@ https://github.com/user-attachments/assets/633c17c7-5b73-48f4-bdc2-68b9d7372501
 
 
 (change category)
-https://github.com/user-attachments/assets/02e844a5-f4b1-4a1d-8504-db8cfacf2bfc
+
+https://github.com/user-attachments/assets/d07aa141-05ad-42af-9732-d225d4e5fae1
+
 
 
 📱 Realm for both screens
-https://github.com/user-attachments/assets/1614a061-5848-4c56-b5a4-5318c615a403
+
+https://github.com/user-attachments/assets/428c9c7a-3b18-4751-8783-981f1d2b4b9b
+
 
 
 ---
